@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    h1 Select Database
+    form(action='/', method='post')
+      .col-md-4.col-md-offset-4
+          .form-group
+              select(name='database').form-control
+                option(disabled selected value) Select
+                for item in databases
+                  option() #{item}
+          .form-group
+              button(
+                type='submit'
+              ).form-control.btn.btn-info Subscribe

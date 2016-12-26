@@ -1,10 +1,12 @@
 var express = require('express');
-var MongoStream = require('mongo-trigger');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
+var MongoStream = require('mongo-trigger');
+
+var routes = require('./routes/index');
 
 var app = express();
 
@@ -16,6 +18,8 @@ app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
+
+app.use('/', routes);
 
 mongoose.connect('mongodb://localhost/test');
 var connection = mongoose.createConnection('mongodb://localhost/test');
@@ -32,6 +36,7 @@ connection.on('open', function() {
         for (let i = 0; i < allDatabases.length; i++) {
             databases.push(allDatabases[i]['name']);
         }
+        app.locals.databases  = databases
     });
 });
 
@@ -42,14 +47,6 @@ watcher.watch('test.kittens', function(event) {
   // parse the results
   // console.log('something changed:', event);
   trace.push(event[2]['operation']);
-});
-
-app.use('/', function (req, res) {
-    console.log(req.body.test);
-    res.render('layout', {
-        title: 'Subscription',
-        databases: databases
-    });
 });
 
 app.listen(3000, function() {
